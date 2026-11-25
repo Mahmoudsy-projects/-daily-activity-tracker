@@ -1,0 +1,489 @@
+<!doctype html><html lang="fa"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>
+*{box-sizing:border-box}body{margin:0;background:#f1eee6;color:#16202c;font:16px Tahoma,Arial,sans-serif}header,main{width:calc(100% - 96px);margin:auto}header{height:112px;border-bottom:1px solid #d8d2c4;display:flex;align-items:center;justify-content:space-between}h1{font-size:30px;margin:0;font-weight:500}h2{font-size:18px;margin:0;font-weight:500}h3{font-size:14px;font-weight:400;color:#505b6c;margin:0}button{font:inherit;color:inherit;background:#fffdf9;border:1px solid #d8d2c4;padding:9px 13px;border-radius:2px}.active{background:#f1c331;color:#f1eee6;border-color:#f1c331}.bar{height:83px;display:flex;align-items:center;gap:10px}.bar .grow{margin-inline-start:auto}.grid{display:grid;grid-template-columns:267px minmax(0,1fr);gap:20px}.panel{border:1px solid #d8d2c4;background:#faf8f2}.top{display:flex;justify-content:space-between;align-items:center;padding:16px 17px;border-bottom:1px solid #d8d2c4;height:61px}.check{padding:0 16px}.item{display:flex;align-items:center;gap:11px;height:45px;border-bottom:1px solid #e5dfd3;font-size:14px}.item:last-child{border:none}.swatch{width:4px;height:20px;background:var(--c)}.box{width:17px;height:17px;border:1px solid #9e9789;text-align:center;line-height:15px;color:#216755}.grip{margin-inline-start:auto;color:#f1c331}.timeline{padding:21px 20px}.lane{height:94px;position:relative;border-bottom:1px solid #d8d2c4;background:repeating-linear-gradient(90deg,transparent 0 calc(100% / 12 - 1px),#e6e0d4 calc(100% / 12 - 1px) calc(100% / 12));border-left:1px solid #e6e0d4}.block{position:absolute;top:19px;height:57px;background:var(--c);left:calc(var(--x)*100% / 12);width:calc(var(--w)*100% / 12 - 4px);padding:8px 8px;border-inline:3px solid #ffffff40;color:#fff;white-space:nowrap;overflow:hidden;font-size:13px;line-height:20px;text-align:right}.block small{font-size:11px;color:#16202c}.ticks{display:flex;justify-content:space-between;margin-top:10px;font-size:12px;color:#505b6c}.hint{margin:18px 0 0;color:#f1c331;font-size:13px}.summary{margin-top:23px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#d8d2c4}.metric{background:#faf8f2;padding:15px 17px}.metric strong{display:block;font-size:22px;font-weight:500;margin-top:8px}
+
+[hidden]{display:none!important}
+.tabs{display:flex;gap:6px;margin-top:18px;border-bottom:1px solid #d8d2c4}
+.tabs button{border-bottom:none;cursor:pointer}
+#reports{margin:20px 0}
+.chart{padding:20px}
+.chart h3{font-size:16px;color:#16202c;margin-bottom:16px}
+.chart-row{display:grid;grid-template-columns:135px minmax(0,1fr) 100px;gap:12px;align-items:center;margin:9px 0;font-size:13px}
+.track{height:14px;background:#e6e0d4}
+.fill{display:block;height:100%;width:calc(var(--minutes) * 100% / 360);background:var(--color,#f1c331)}
+.metric progress{width:100%;height:8px;accent-color:#f1c331}
+.period{font-size:13px;color:#505b6c;margin:0 0 12px}
+@media(max-width:780px){
+  header,main{width:calc(100% - 28px)}
+  h1{font-size:22px}
+  .grid{grid-template-columns:1fr}
+  .bar{overflow:auto}
+  .bar>*{flex-shrink:0}
+  .timeline{overflow:auto}
+  .timeline>div{min-width:720px}
+  .metrics{grid-template-columns:repeat(2,1fr)}
+  .top{height:auto;min-height:61px;flex-wrap:wrap;gap:10px}
+  .chart-row{grid-template-columns:105px minmax(0,1fr) 76px;gap:7px}
+}
+
+button{border-radius:7px}
+.active{color:#16202c}
+.panel{border-radius:12px;overflow:hidden}
+.top{background:#f6f3ec}
+.tabs button{border-radius:7px 7px 0 0}
+.block{color:#16202c;border-radius:5px;border-inline-color:#16202c40}
+.track,.fill{border-radius:8px}
+.swatch{border-radius:4px}
+.hint,.grip{color:#505b6c}
+.metric progress{accent-color:#416b9c}
+button:focus-visible{outline:2px solid #416b9c;outline-offset:2px}
+
+.profile-name{display:block;margin-top:6px;color:#505b6c;font-size:13px}
+body[data-profile="hani"]{background:#f6edf1;color:#382436}
+body[data-profile="hani"] .panel,body[data-profile="hani"] .metric{background:#fff8fa;border-color:#e4cbd8}
+body[data-profile="hani"] .top,body[data-profile="hani"] .track{background:#f2e4ef;border-color:#e4cbd8}
+body[data-profile="hani"] button{background:#fff8fa;border-color:#e4cbd8;color:#382436}
+body[data-profile="hani"] .active{background:#87456b;color:#fff;border-color:#87456b}
+body[data-profile="hani"] .block,body[data-profile="hani"] .fill,body[data-profile="hani"] .swatch{background:#d4a3bd}
+body[data-profile="hani"] .block:nth-child(even),body[data-profile="hani"] .chart-row:nth-of-type(even) .fill{background:#bda9d5}
+body[data-profile="hani"] .profile-name,body[data-profile="hani"] .hint{color:#794064}
+.clock-grid{position:relative;padding-top:25px}
+.clock-grid .lane{background-size:calc(100% / var(--hours)) 100%;background-image:linear-gradient(to right,transparent calc(100% - 1px),#d8d2c4 calc(100% - 1px))}
+.clock-grid .block{left:calc((var(--x) + 8 - var(--first)) * 100% / var(--hours));width:calc(var(--w) * 100% / var(--hours) - 4px)}
+.now{position:absolute;top:24px;bottom:0;width:2px;background:#946500;z-index:2;pointer-events:none}
+.now time{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);white-space:nowrap;background:#f1c331;color:#16202c;border-radius:5px;padding:4px 6px;font-size:11px}
+body[data-profile="hani"] .now{background:#87456b}
+body[data-profile="hani"] .now time{background:#87456b;color:white}
+</style><body dir="rtl"><header><div><h1>دفتر عملکرد روزانه</h1><span class="profile-name" id="profile-name">دفتر محمود</span></div><div aria-label="انتخاب پروفایل"><button data-profile-choice="mahmoud" class="active" aria-pressed="true">محمود</button> <button data-profile-choice="hani" aria-pressed="false">هانی</button></div></header><main>
+<nav class="tabs" role="tablist" aria-label="بخش‌های دفتر">
+<button id="daily-tab" role="tab" aria-selected="true" aria-controls="daily" class="active">ثبت روزانه</button>
+<button id="reports-tab" role="tab" aria-selected="false" aria-controls="reports" tabindex="-1">گزارش‌ها</button>
+</nav>
+<style>
+.tools{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.bar{height:auto;margin:16px 0}.bar input,dialog input,dialog select,dialog textarea{font:inherit;padding:7px;border:1px solid #d8d2c4;border-radius:5px;background:#fffdf9;color:#16202c}.item{gap:6px;height:auto;min-height:43px}.item button{padding:4px 6px}.item .label{flex:1;min-width:0;overflow-wrap:anywhere}.grip{cursor:grab}.timeline-scroll{overflow:auto;padding:0 14px 12px}.timeline-scroll>div{min-width:1100px;padding-inline:16px}.clock-grid .lane{height:78px}.clock-grid .block{left:var(--left);width:var(--width);top:12px;height:54px;display:flex;align-items:center;justify-content:center;padding:0;border:0;cursor:grab;container-type:inline-size;touch-action:none}.block .caption{display:block;min-width:0;max-width:100%;padding-inline:8px;line-height:1.45;font-size:13px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.block .caption small{display:block;font-size:11px;overflow:hidden;text-overflow:ellipsis}.block .edge{position:absolute;top:0;bottom:0;width:6px;cursor:ew-resize;background:#16202c22;z-index:1}.edge.start{left:0}.edge.end{right:0}@container (max-width:105px){.block .caption small{display:none}}@container (max-width:38px){.block .caption{display:none}}.clock-grid .lane{border-left:0}.clock-grid .lane.drop{background-color:#f1c33125}.ticks{position:relative;height:18px}.ticks span{position:absolute;transform:translateX(-50%)}dialog{max-width:calc(100vw - 30px);width:440px;border:1px solid #d8d2c4;border-radius:12px;color:inherit;background:#faf8f2;padding:20px}body[data-profile="hani"] dialog{background:#fff8fa}dialog::backdrop{background:#16202c66}dialog label{display:block;margin:12px 0}dialog input:not([type=checkbox]),dialog select,dialog textarea{max-width:100%;width:100%;margin-top:4px}fieldset{border:1px solid #d8d2c4;margin:10px 0}fieldset label{display:inline-block;margin:5px}#status{min-height:1.4em;font-size:13px;color:#505b6c;margin-block:12px}.empty{color:#505b6c;font-size:14px}.chart-row{grid-template-columns:minmax(105px,160px) minmax(45px,1fr) minmax(88px,155px)}
+
+.clock-grid .block.is-complete,body[data-profile="hani"] .clock-grid .block.is-complete{background:#e4e4e4;color:#47505b;box-shadow:inset 0 0 0 1px #cdced1}
+</style>
+<section id="daily" role="tabpanel" aria-labelledby="daily-tab">
+<div class="bar tools"><button id="prev">روز قبل</button><input id="date" type="date" aria-label="انتخاب تاریخ"><button id="next">روز بعد</button><button id="today">امروز</button><strong id="date-label"></strong><button id="export" class="grow">پشتیبان‌گیری</button><button id="import">بازیابی</button><input type="file" id="backup" accept=".json,application/json" hidden></div>
+<div class="grid"><aside class="panel"><div class="top"><h2>چک‌لیست</h2><button id="add">＋ فعالیت</button></div><div class="check" id="activities"></div></aside>
+<section class="panel"><div class="top"><h2>تایم‌لاین</h2><div class="tools"><button id="add-block">＋ بلوک</button><button id="add-lane">＋ ردیف</button></div></div>
+<div class="timeline-scroll"><div dir="ltr"><div class="clock-grid" id="grid"><div id="lanes"></div><div class="now" hidden><time></time></div></div><div class="ticks" id="ticks"></div></div></div>
+<p class="hint" style="padding:0 16px 16px">فعالیت را از ⠿ بکش یا «＋ بلوک» را بزن. برای دیدن جزئیات روی بلوک کلیک کن.</p>
+</section></div></section>
+<section id="reports" class="panel" role="tabpanel" aria-labelledby="reports-tab" hidden>
+<div class="top"><h2>گزارش عملکرد</h2><div class="tools" id="periods"></div></div><div class="metrics" id="metrics"></div><div class="chart"><p class="period" id="range"></p><div class="tools"><button id="group">دسته‌بندی‌ها</button><label><input id="parallel" type="checkbox"> فقط هم‌زمان با رصد بازار</label></div><h3 style="margin:14px 0">زمان ثبت‌شده</h3><div id="bars"></div></div></section>
+<p id="status" role="status"></p>
+</main><dialog id="dialog"></dialog>
+<script>
+'use strict';
+const $ = id => document.getElementById(id);
+const key = 'daily-activity-tracker-v1';
+const defaultStart = 4 * 60, defaultEnd = 21 * 60, defaultLanes = 4;
+const colors = ['#7bb29e','#6d93c6','#d5a071','#ab98cb'];
+const names = ['بکتست','بررسی بازار','ورزش','ناهار','اکسپلورگردی','رصد بازار','توسعه اکسپرت','آموزش ویدیویی','مطالعه','مرور ژورنال ترید','تمرین تایپ','ترید','آموزش البروکس','کدنویسی'];
+const weekdays = ['یکشنبه','دوشنبه','سه‌شنبه','چهارشنبه','پنجشنبه','جمعه','شنبه'];
+const dateFormat = new Intl.DateTimeFormat('fa-IR-u-ca-persian',{dateStyle:'full',timeZone:'UTC'});
+const persian = new Intl.DateTimeFormat('en-u-ca-persian-nu-latn',{year:'numeric',month:'numeric',timeZone:'UTC'});
+const tehran = new Intl.DateTimeFormat('en-GB',{timeZone:'Asia/Tehran',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',hourCycle:'h23'});
+const number = value => new Intl.NumberFormat('fa-IR',{useGrouping:false}).format(value);
+const iso = d => d.toISOString().slice(0,10);
+const shift = (d, days) => iso(new Date(Date.parse(d) + days * 86400000));
+const weekday = d => new Date(d).getUTCDay();
+const uid = () => globalThis.crypto?.randomUUID?.() || Date.now().toString(36)+Math.random().toString(36).slice(2);
+function clock() {
+  const p = Object.fromEntries(tehran.formatToParts().map(x => [x.type,x.value]));
+  return {date:p.year+'-'+p.month+'-'+p.day, minute:Number(p.hour)*60+Number(p.minute)};
+}
+const time = n => [Math.floor(n/60),n%60].map(x => String(x).padStart(2,'0')).join(':');
+const faTime = n => time(n).replace(/[0-9]/g, number);
+const duration = n => [n>=60 ? number(Math.floor(n/60))+' ساعت' : '', n%60 || n===0 ? number(n%60)+' دقیقه' : ''].filter(Boolean).join(' و ');
+const safe = s => String(s).replace(/[&<>"']/g, x => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[x]));
+const fresh = () => ({version:1,profiles:Object.fromEntries(['mahmoud','hani'].map(person => [person,{
+  rules:Object.fromEntries(names.map((name,i)=>['a'+i,[{date:'0001-01-01',value:{name,color:colors[i%4],category:'',order:i,days:[0,1,2,3,4,5,6]}}]])),
+  days:{}
+}]))});
+let db = fresh(), person = 'mahmoud', date = clock().date, period = 0, grouped = false, tab = 'daily', displayStart = defaultStart, displayEnd = defaultEnd;
+const profile = () => db.profiles[person];
+const blank = () => ({overrides:{},checks:{},blocks:[],lanes:defaultLanes});
+const day = (d=date) => profile().days[d] || blank();
+const editDay = () => profile().days[date] ??= blank();
+function activities(d=date) {
+  const overrides = day(d).overrides;
+  const rules = profile().rules;
+  return [...new Set([...Object.keys(rules), ...Object.keys(overrides)])].flatMap(id => {
+    const current = rules[id]?.findLast(entry=>entry.date<=d)?.value;
+    const value = Object.hasOwn(overrides,id) ? overrides[id] : current?.days.includes(weekday(d)) ? current : null;
+    return value ? [{id,...value}] : [];
+  }).sort((a,b)=>a.order-b.order);
+}
+function notify(message){ $('status').textContent=message; }
+function save() {
+  try { localStorage.setItem(key,JSON.stringify(db)); notify('ذخیره شد.'); return true; }
+  catch { notify('مرورگر ذخیرهٔ محلی را انجام نداد. از دکمهٔ پشتیبان‌گیری استفاده کن.'); return false; }
+}
+try { const saved=localStorage.getItem(key); if(saved) db=validate(JSON.parse(saved)); }
+catch { notify('خواندن دادهٔ محلی ممکن نبود. اگر نسخهٔ پشتیبان داری، آن را بازیابی کن.'); }
+function selectTab(next){
+  tab=next;
+  for(const name of ['daily','reports']){
+    $(name).hidden=name!==tab;
+    $(name+'-tab').classList.toggle('active',name===tab);
+    $(name+'-tab').setAttribute('aria-selected',name===tab);
+  }
+  render();
+}
+for(const name of ['daily','reports']){
+  $(name+'-tab').onclick=()=>selectTab(name);
+  $(name+'-tab').onkeydown=e=>{if(['ArrowRight','ArrowLeft'].includes(e.key)){e.preventDefault();const other=name==='daily'?'reports':'daily';selectTab(other);$(other+'-tab').focus();}};
+}
+for (const button of document.querySelectorAll('[data-profile-choice]')) button.onclick=()=>{
+  person=button.dataset.profileChoice;
+  document.body.dataset.profile=person;
+  $('profile-name').textContent='دفتر '+button.textContent;
+  document.querySelectorAll('[data-profile-choice]').forEach(b=>{b.classList.toggle('active',b===button);b.setAttribute('aria-pressed',b===button);});
+  render();
+};
+function setDate(d){ if(!d || !Number.isFinite(Date.parse(d))) return; date=d; render(); }
+$('date').onchange=e=>setDate(e.target.value);
+$('today').onclick=()=>setDate(clock().date);
+$('prev').onclick=()=>setDate(shift(date,-1));
+$('next').onclick=()=>setDate(shift(date,1));
+function render(){
+  $('date').value=date;
+  $('date-label').textContent=dateFormat.format(new Date(date));
+  renderActivities();
+  renderTimeline();
+  if(tab==='reports') report();
+}
+function renderActivities(){
+  $('activities').innerHTML=activities().map(a=>`<div class="item">
+    <input type="checkbox" data-check="${a.id}" aria-label="تکمیل ${safe(a.name)}" ${day().checks[a.id]?'checked':''}>
+    <i class="swatch" style="--c:${a.color}"></i><span class="label">${safe(a.name)}</span>
+    <button data-edit="${a.id}" aria-label="ویرایش ${safe(a.name)}">ویرایش</button>
+    <button class="grip" data-drag="${a.id}" draggable="true" aria-label="ثبت زمان ${safe(a.name)}" title="بکش یا کلیک کن">⠿</button></div>`).join('') || '<p class="empty">برای این روز فعالیتی تعریف نشده است.</p>';
+}
+$('activities').onchange=e=>{
+  const id=e.target.dataset.check;
+  if(!id)return;
+  editDay().checks[id]=e.target.checked;
+  save();
+  renderTimeline();
+};
+$('activities').onclick=e=>{
+  if(e.target.dataset.edit) activityDialog(activities().find(a=>a.id===e.target.dataset.edit));
+  if(e.target.dataset.drag) blockDialog(null,e.target.dataset.drag);
+};
+let sourceActivity = null;
+$('activities').addEventListener('dragstart',e=>{
+  if(!e.target.dataset.drag)return;
+  sourceActivity=e.target.dataset.drag;
+  e.dataTransfer.setData('text/plain',sourceActivity);
+  e.dataTransfer.effectAllowed='copy';
+});
+$('activities').addEventListener('dragend',()=>{sourceActivity=null;document.querySelectorAll('.drop').forEach(n=>n.classList.remove('drop'));});
+function show(content, submit){
+  const dialog=$('dialog');
+  dialog.innerHTML=`<form>${content}</form>`;
+  dialog.querySelector('form').onsubmit=e=>{e.preventDefault();if(submit(new FormData(e.target),e.submitter?.value)!==false){dialog.close();render();}};
+  dialog.querySelector('[data-close]').onclick=()=>dialog.close();
+  dialog.showModal();
+}
+const cancel='<button type="button" data-close>انصراف</button>';
+$('add').onclick=()=>activityDialog();
+function activityDialog(a){
+  const list=activities();
+  show(`<h2>${a?'ویرایش فعالیت':'فعالیت جدید'}</h2>
+  <label>نام<input name="name" required maxlength="90" value="${safe(a?.name??'')}"></label>
+  <label>دسته‌بندی<input name="category" maxlength="60" value="${safe(a?.category??'')}"></label>
+  <label>رنگ<input name="color" type="color" value="${a?.color??colors[list.length%4]}"></label>
+  <label>جایگاه در فهرست<input name="position" type="number" min="1" max="${list.length+Number(!a)}" required value="${a?list.findIndex(x=>x.id===a.id)+1:list.length+1}"></label>
+  <fieldset><legend>روزهای تکرار</legend><button type="button" id="all-days">همهٔ روزها</button>${[6,0,1,2,3,4,5].map(i=>`<label><input type="checkbox" name="days" value="${i}" ${(!a||a.days.includes(i))?'checked':''}>${weekdays[i]}</label>`).join('')}</fieldset>
+  <label>دامنهٔ تغییر<select name="scope"><option value="day">فقط همین روز</option><option value="future" ${!a?'selected':''}>همین روز و روزهای آینده</option></select></label>
+  <p role="alert" class="empty"></p><div class="tools"><button class="active" value="save">ذخیره</button>${a?'<button value="delete" formnovalidate>حذف از چک‌لیست</button>':''}${cancel}</div>`,(form,action)=>{
+    const id=a?.id??uid(), scope=form.get('scope'), days=form.getAll('days').map(Number);
+    const position=Number(form.get('position'))-1;
+    const others=list.filter(x=>x.id!==id);
+    const before=others[position-1]?.order, after=others[position]?.order;
+    const order=before===undefined?(after??1)-1:after===undefined?before+1:(before+after)/2;
+    const value=action==='delete'?null:{name:form.get('name').trim(),category:form.get('category').trim(),color:form.get('color'),days,order};
+    if(value && (!value.name || (scope==='future'&&!days.length))){
+      $('dialog').querySelector('[role=alert]').textContent='نام فعالیت و برای تکرار دست‌کم یک روز را وارد کن.';return false;
+    }
+    if(scope==='day') editDay().overrides[id]=value;
+    else{
+      const rules=profile().rules[id]??=[];
+      profile().rules[id]=rules.filter(e=>e.date<date).concat({date,value});
+      delete editDay().overrides[id];
+    }
+    save();
+  });
+  $('all-days').onclick=()=> $('dialog').querySelectorAll('[name=days]').forEach(e=>e.checked=true);
+}
+function axis(){
+  const blocks=day().blocks;
+  const earliest=blocks.reduce((min,b)=>Math.min(min,b.start),defaultStart);
+  const latest=blocks.reduce((max,b)=>Math.max(max,b.end),defaultEnd);
+  displayStart=Math.floor(earliest/60)*60;
+  displayEnd=Math.ceil(latest/60)*60;
+}
+const percent=minute=>(minute-displayStart)*100/(displayEnd-displayStart);
+function renderTimeline(){
+  axis();
+  const grid=$('grid');
+  grid.style.setProperty('--hours',(displayEnd-displayStart)/60);
+  $('lanes').replaceChildren();
+  for(let lane=0;lane<day().lanes;lane++){
+    const row=document.createElement('div');
+    row.className='lane';row.dataset.lane=lane;
+    row.setAttribute('aria-label','ردیف '+number(lane+1));
+    for(const b of day().blocks.filter(x=>x.lane===lane)){
+      const block=document.createElement('button');
+      block.type='button';block.className='block';block.dir='rtl';
+      block.innerHTML='<span class="edge start" data-edge="start"></span><span class="caption"><span></span><small></small></span><span class="edge end" data-edge="end"></span>';
+      paint(block,b);
+      block.onclick=()=>blockDialog(b);
+      block.oncontextmenu=e=>{e.preventDefault();blockDialog(b);};
+      block.onpointerdown=e=>moveBlock(e,block,b);
+      row.append(block);
+    }
+    row.ondragover=e=>{if(sourceActivity){e.preventDefault();row.classList.add('drop');}};
+    row.ondragleave=()=>row.classList.remove('drop');
+    row.ondrop=e=>{
+      if(!sourceActivity)return;
+      e.preventDefault();
+      const a=activities().find(x=>x.id===sourceActivity);
+      sourceActivity=null;
+      if(!a)return;
+      const start=Math.min(1435,minuteAt(e.clientX,row));
+      putBlock({id:uid(),activity:a.id,name:a.name,color:a.color,category:a.category,start,end:Math.min(1440,start+30),lane,note:''});
+      save();render();
+    };
+    $('lanes').append(row);
+  }
+  $('ticks').replaceChildren();
+  for(let min=displayStart;min<=displayEnd;min+=60){
+    const tick=document.createElement('span');
+    tick.textContent=faTime(min).slice(0,2);tick.style.left=percent(min)+'%';$('ticks').append(tick);
+  }
+  liveLine();
+}
+function liveLine(){
+  const live=clock(), line=document.querySelector('.now');
+  line.hidden=live.date!==date||live.minute<displayStart||live.minute>displayEnd;
+  if(line.hidden)return;
+  line.style.left=percent(live.minute)+'%';
+  line.firstElementChild.textContent=faTime(live.minute)+' تهران';
+}
+setInterval(liveLine,15000);
+function paint(node,b){
+  node.style.setProperty('--left',percent(b.start)+'%');
+  node.style.setProperty('--width',Math.max(0,percent(b.end)-percent(b.start))+'%');
+  node.style.setProperty('--c',b.color);
+  const completed=day().checks[b.activity]===true;
+  node.classList.toggle('is-complete',completed);
+  const label=b.name+' · '+faTime(b.start)+' تا '+faTime(b.end)+' · '+duration(b.end-b.start)+(completed?' · انجام شده':'');
+  node.title=label;node.setAttribute('aria-label',label);
+  node.querySelector('.caption span').textContent=b.name;
+  node.querySelector('small').textContent=faTime(b.start)+' – '+faTime(b.end);
+}
+const snap=n=>Math.round(n/5)*5;
+const clamp=(n,min,max)=>Math.min(max,Math.max(min,n));
+function minuteAt(x,row){
+  const r=row.getBoundingClientRect();
+  return clamp(snap(displayStart+(x-r.left)*(displayEnd-displayStart)/r.width),0,1440);
+}
+function overlaps(a,b){return a.start<b.end&&b.start<a.end;}
+function putBlock(b){
+  const d=editDay();
+  const occupied=lane=>d.blocks.some(x=>x.id!==b.id&&x.lane===lane&&overlaps(x,b));
+  if(occupied(b.lane)){
+    const free=Array.from({length:d.lanes},(_,i)=>i).find(i=>!occupied(i));
+    b.lane=free??d.lanes;
+  }
+  d.lanes=Math.max(d.lanes,b.lane+1);
+  d.blocks=d.blocks.filter(x=>x.id!==b.id).concat(b);
+}
+function moveBlock(e,node,original){
+  if(e.button!==0)return;
+  const row=node.parentElement, edge=e.target.dataset.edge;
+  const x=e.clientX,y=e.clientY;
+  const scale=(displayEnd-displayStart)/row.getBoundingClientRect().width;
+  const draft={...original};
+  let changed=false;
+  node.setPointerCapture(e.pointerId);
+  const update=ev=>{
+    if(!changed&&Math.hypot(ev.clientX-x,ev.clientY-y)<4)return;
+    changed=true;
+    const delta=snap((ev.clientX-x)*scale);
+    if(edge==='start') draft.start=clamp(original.start+delta,0,original.end-5);
+    else if(edge==='end') draft.end=clamp(original.end+delta,original.start+5,1440);
+    else {
+      const length=original.end-original.start;
+      draft.start=clamp(original.start+delta,0,1440-length);draft.end=draft.start+length;
+      const target=document.elementFromPoint(ev.clientX,ev.clientY)?.closest('.lane');
+      if(target) draft.lane=Number(target.dataset.lane);
+    }
+    paint(node,draft);notify(faTime(draft.start)+' تا '+faTime(draft.end)+' · '+duration(draft.end-draft.start));
+  };
+  const finish=ev=>{
+    node.removeEventListener('pointermove',update);
+    node.removeEventListener('pointerup',finish);
+    node.removeEventListener('pointercancel',finish);
+    if(!changed)return;
+    node.onclick=event=>event.preventDefault();
+    if(ev.type==='pointerup'){putBlock(draft);save();}
+    render();
+  };
+  node.addEventListener('pointermove',update);
+  node.addEventListener('pointerup',finish);
+  node.addEventListener('pointercancel',finish);
+}
+$('add-lane').onclick=()=>{editDay().lanes++;save();render();};
+$('add-block').onclick=()=>blockDialog();
+function blockDialog(b, selected){
+  const options=activities();
+  if(b&&!options.some(a=>a.id===b.activity))options.push({id:b.activity,name:b.name,color:b.color,category:b.category});
+  if(!options.length){notify('ابتدا از چک‌لیست یک فعالیت اضافه کن.');return;}
+  const start=b?.start??clamp(snap(clock().minute),defaultStart,defaultEnd-30);
+  show(`<h2>${b?'جزئیات بلوک':'بلوک جدید'}</h2>
+  <label>فعالیت<select name="activity">${options.map(a=>`<option value="${a.id}" ${a.id===(selected??b?.activity)?'selected':''}>${safe(a.name)}</option>`).join('')}</select></label>
+  <label>شروع<input name="start" dir="ltr" value="${time(start)}" required></label><label>پایان<input name="end" dir="ltr" value="${time(b?.end??start+30)}" required></label>
+  <label>ردیف<input name="lane" type="number" min="1" max="${day().lanes+1}" value="${(b?.lane??0)+1}" required></label>
+  <label>توضیحات<textarea name="note" maxlength="2000">${safe(b?.note??'')}</textarea></label><p class="empty" role="alert"></p>
+  <div class="tools"><button class="active" value="save">ذخیره</button>${b?'<button value="copy">تکثیر</button><button value="delete" formnovalidate>حذف بلوک</button>':''}${cancel}</div>`,(f,action)=>{
+    if(action==='delete'){editDay().blocks=day().blocks.filter(x=>x.id!==b.id);save();return;}
+    const a=options.find(x=>x.id===f.get('activity'));
+    const start=parseTime(f.get('start')),end=parseTime(f.get('end'));
+    if(!Number.isFinite(start)||!Number.isFinite(end)||start>=end){
+      $('dialog').querySelector('[role=alert]').textContent='زمان را مثل ۰۹:۳۰ وارد کن. پایان باید بعد از شروع باشد.';return false;
+    }
+    putBlock({id:action==='copy'||!b?uid():b.id,activity:a.id,name:a.name,color:a.color,category:a.category,start,end,lane:Number(f.get('lane'))-1,note:f.get('note')});
+    save();
+  });
+}
+function parseTime(value){
+  const latin=value.trim().replace(/[۰-۹]/g,x=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(x)).replace(/[٠-٩]/g,x=>'٠١٢٣٤٥٦٧٨٩'.indexOf(x));
+  const m=/^(\d{1,2}):([0-5]\d)$/.exec(latin);
+  if(!m)return NaN;
+  const minutes=Number(m[1])*60+Number(m[2]);
+  return minutes<=1440?minutes:NaN;
+}
+function coverage(blocks){
+  const events=blocks.flatMap(b=>[[b.start,1],[b.end,-1]]).sort((a,b)=>a[0]-b[0]);
+  let actual=0, overlap=0, active=0, prev=0;
+  for(const [minute,delta] of events){
+    if(active>0)actual+=minute-prev;
+    if(active>1)overlap+=minute-prev;
+    active+=delta;prev=minute;
+  }
+  return {actual,overlap,total:blocks.reduce((sum,b)=>sum+b.end-b.start,0)};
+}
+function rangeFor(d,p){
+  if(!p)return [d,d];
+  if(p===1){const first=shift(d,-((weekday(d)+1)%7));return [first,shift(first,6)];}
+  const stamp=keyFor(d,p);
+  let first=d,last=d;
+  while(keyFor(shift(first,-1),p)===stamp)first=shift(first,-1);
+  while(keyFor(shift(last,1),p)===stamp)last=shift(last,1);
+  return [first,last];
+}
+function keyFor(d,p){
+  const parts=Object.fromEntries(persian.formatToParts(new Date(d)).map(x=>[x.type,x.value]));
+  return p===2?parts.year+'/'+parts.month:parts.year;
+}
+function marketBlocks(blocks){
+  const market=blocks.filter(b=>['a5','a1'].includes(b.activity)||['رصد بازار','بررسی بازار'].includes(b.name));
+  return blocks.filter(b=>!market.includes(b)).flatMap(b=>{
+    const clipped=market.map(m=>({...b,start:Math.max(b.start,m.start),end:Math.min(b.end,m.end)})).filter(x=>x.start<x.end).sort((a,c)=>a.start-c.start);
+    const merged=[];
+    for(const segment of clipped){
+      const last=merged.at(-1);
+      if(last&&last.end>=segment.start)last.end=Math.max(last.end,segment.end);
+      else merged.push(segment);
+    }
+    return merged;
+  });
+}
+const periods=['روزانه','هفتگی','ماهانه','سالانه'];
+$('periods').innerHTML='<button id="report-prev">قبلی</button><button id="report-next">بعدی</button>'+periods.map((p,i)=>`<button data-period="${i}">${p}</button>`).join('');
+$('periods').onclick=e=>{
+  if(e.target.dataset.period!==undefined){period=Number(e.target.dataset.period);report();}
+  if(e.target.id==='report-prev')setDate(shift(rangeFor(date,period)[0],-1));
+  if(e.target.id==='report-next')setDate(shift(rangeFor(date,period)[1],1));
+};
+$('group').onclick=()=>{grouped=!grouped;report();};
+$('parallel').onchange=report;
+function report(){
+  const [first,last]=rangeFor(date,period);
+  $('range').textContent=dateFormat.format(new Date(first))+(first===last?'':' تا '+dateFormat.format(new Date(last)));
+  document.querySelectorAll('[data-period]').forEach(b=>{b.classList.toggle('active',Number(b.dataset.period)===period);b.setAttribute('aria-pressed',Number(b.dataset.period)===period);});
+  $('group').classList.toggle('active',grouped);
+  $('group').setAttribute('aria-pressed',grouped);
+  const sums={actual:0,overlap:0,total:0}, groups=new Map();
+  let planned=0,done=0;
+  const until=period?Math.min(Date.parse(last),Math.max(Date.parse(clock().date),Date.parse(date))):Date.parse(last);
+  for(let d=first;d<=last;d=shift(d,1)){
+    const record=day(d), list=activities(d);
+    if(Date.parse(d)<=until||profile().days[d]){planned+=list.length;done+=list.filter(a=>record.checks[a.id]).length;}
+    const blocks=$('parallel').checked?marketBlocks(record.blocks):record.blocks;
+    const totals=coverage(blocks);
+    for(const k of Object.keys(sums))sums[k]+=totals[k];
+    for(const b of blocks){
+      const name=grouped?b.category||'بدون دسته':b.name;
+      const row=groups.get(name)??{minutes:0,count:new Set(),color:b.color};
+      row.minutes+=b.end-b.start;row.count.add(d+'/'+b.id);groups.set(name,row);
+    }
+  }
+  const completed=planned?number(done)+' از '+number(planned)+' · '+number(Math.round(done/planned*100))+'٪':'—';
+  $('metrics').innerHTML=[['زمان واقعی ثبت‌شده',duration(sums.actual)],['مجموع مدت فعالیت‌ها',duration(sums.total)],['زمان هم‌پوشانی',duration(sums.overlap)],['تکمیل چک‌لیست',completed]]
+    .map(([title,value])=>`<div class="metric"><h3>${title}</h3><strong>${value}</strong></div>`).join('');
+  const rows=[...groups].sort((a,b)=>b[1].minutes-a[1].minutes);
+  const max=rows[0]?.[1].minutes||1;
+  $('bars').innerHTML=rows.map(([name,{minutes,count,color}])=>`<div class="chart-row"><span>${safe(name)}</span><span class="track"><span class="fill" style="width:${minutes/max*100}%;background-color:${color}"></span></span><span>${duration(minutes)} · ${number(count.size)} بار</span></div>`).join('')||'<p class="empty">در این بازه زمانی ثبت نشده است.</p>';
+}
+function validate(data){
+  const object=x=>x&&typeof x==='object'&&!Array.isArray(x);
+  const validId=x=>typeof x==='string'&&/^[\w-]+$/.test(x)&&!['__proto__','constructor','prototype'].includes(x);
+  const validDate=x=>typeof x==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(x)&&Number.isFinite(Date.parse(x))&&iso(new Date(x))===x;
+  const validColor=x=>typeof x==='string'&&/^#[a-f\d]{6}$/i.test(x);
+  const numberBetween=(x,min,max)=>Number.isInteger(x)&&x>=min&&x<=max;
+  const activity=x=>x===null||object(x)&&typeof x.name==='string'&&typeof x.category==='string'&&validColor(x.color)&&Number.isFinite(x.order)&&Array.isArray(x.days)&&x.days.every(n=>numberBetween(n,0,6));
+  const check=(ok)=>{if(!ok)throw new Error('Invalid backup');};
+  check(object(data)&&data.version===1&&object(data.profiles));
+  for(const person of ['mahmoud','hani']){
+    const p=data.profiles[person];
+    check(object(p)&&object(p.rules)&&object(p.days));
+    for(const [id,entries] of Object.entries(p.rules)){
+      check(validId(id)&&Array.isArray(entries));
+      check(entries.every((e,i)=>object(e)&&validDate(e.date)&&activity(e.value)&&(!i||entries[i-1].date<e.date)));
+    }
+    for(const [d,record] of Object.entries(p.days)){
+      check(validDate(d)&&object(record)&&object(record.checks)&&object(record.overrides)&&Array.isArray(record.blocks)&&numberBetween(record.lanes,1,10000));
+      check(Object.entries(record.checks).every(([id,value])=>validId(id)&&typeof value==='boolean'));
+      check(Object.entries(record.overrides).every(([id,value])=>validId(id)&&activity(value)));
+      check(new Set(record.blocks.map(b=>b?.id)).size===record.blocks.length);
+      check(record.blocks.every(b=>object(b)&&validId(b.id)&&validId(b.activity)&&validColor(b.color)&&typeof b.name==='string'&&typeof b.category==='string'&&typeof b.note==='string'&&numberBetween(b.start,0,1439)&&numberBetween(b.end,b.start+1,1440)&&numberBetween(b.lane,0,record.lanes-1)));
+      record.lanes=Math.max(defaultLanes,record.lanes);
+    }
+  }
+  return data;
+}
+$('export').onclick=()=>{
+  const url=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));
+  const link=document.createElement('a');link.href=url;link.download='Daily_Activity_Backup_'+clock().date+'.json';link.click();
+  setTimeout(()=>URL.revokeObjectURL(url),10000);
+};
+$('import').onclick=()=>$('backup').click();
+$('backup').onchange=async e=>{
+  const file=e.target.files[0];e.target.value='';
+  if(!file)return;
+  try{
+    const incoming=validate(JSON.parse(await file.text()));
+    show('<h2>بازیابی نسخهٔ پشتیبان</h2><p>داده‌های فعلی هر دو پروفایل با محتوای این فایل جایگزین می‌شوند.</p><div class="tools"><button class="active">بازیابی</button>'+cancel+'</div>',()=>{
+      const previous=db;db=incoming;
+      if(!save()){db=previous;$('dialog').querySelector('p').textContent='ذخیرهٔ محلی ممکن نشد. داده‌های فعلی هنوز برقرارند.';return false;}
+    });
+  }catch{notify('این فایل، پشتیبان معتبر دفتر فعالیت نیست.');}
+};
+render();
+</script></body></html>
