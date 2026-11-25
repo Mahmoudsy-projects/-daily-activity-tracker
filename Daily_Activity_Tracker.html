@@ -1,4 +1,4 @@
-<!doctype html><html lang="fa"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><style>
+<!doctype html><html lang="fa"><meta charset="utf-8"><title>دفتر عملکرد روزانه · ۱٫۱</title><meta name="viewport" content="width=device-width, initial-scale=1"><style>
 *{box-sizing:border-box}body{margin:0;background:#f1eee6;color:#16202c;font:16px Tahoma,Arial,sans-serif}header,main{width:calc(100% - 96px);margin:auto}header{height:112px;border-bottom:1px solid #d8d2c4;display:flex;align-items:center;justify-content:space-between}h1{font-size:30px;margin:0;font-weight:500}h2{font-size:18px;margin:0;font-weight:500}h3{font-size:14px;font-weight:400;color:#505b6c;margin:0}button{font:inherit;color:inherit;background:#fffdf9;border:1px solid #d8d2c4;padding:9px 13px;border-radius:2px}.active{background:#f1c331;color:#f1eee6;border-color:#f1c331}.bar{height:83px;display:flex;align-items:center;gap:10px}.bar .grow{margin-inline-start:auto}.grid{display:grid;grid-template-columns:267px minmax(0,1fr);gap:20px}.panel{border:1px solid #d8d2c4;background:#faf8f2}.top{display:flex;justify-content:space-between;align-items:center;padding:16px 17px;border-bottom:1px solid #d8d2c4;height:61px}.check{padding:0 16px}.item{display:flex;align-items:center;gap:11px;height:45px;border-bottom:1px solid #e5dfd3;font-size:14px}.item:last-child{border:none}.swatch{width:4px;height:20px;background:var(--c)}.box{width:17px;height:17px;border:1px solid #9e9789;text-align:center;line-height:15px;color:#216755}.grip{margin-inline-start:auto;color:#f1c331}.timeline{padding:21px 20px}.lane{height:94px;position:relative;border-bottom:1px solid #d8d2c4;background:repeating-linear-gradient(90deg,transparent 0 calc(100% / 12 - 1px),#e6e0d4 calc(100% / 12 - 1px) calc(100% / 12));border-left:1px solid #e6e0d4}.block{position:absolute;top:19px;height:57px;background:var(--c);left:calc(var(--x)*100% / 12);width:calc(var(--w)*100% / 12 - 4px);padding:8px 8px;border-inline:3px solid #ffffff40;color:#fff;white-space:nowrap;overflow:hidden;font-size:13px;line-height:20px;text-align:right}.block small{font-size:11px;color:#16202c}.ticks{display:flex;justify-content:space-between;margin-top:10px;font-size:12px;color:#505b6c}.hint{margin:18px 0 0;color:#f1c331;font-size:13px}.summary{margin-top:23px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#d8d2c4}.metric{background:#faf8f2;padding:15px 17px}.metric strong{display:block;font-size:22px;font-weight:500;margin-top:8px}
 
 [hidden]{display:none!important}
@@ -53,7 +53,7 @@ body[data-profile="hani"] .profile-name,body[data-profile="hani"] .hint{color:#7
 .now time{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);white-space:nowrap;background:#f1c331;color:#16202c;border-radius:5px;padding:4px 6px;font-size:11px}
 body[data-profile="hani"] .now{background:#87456b}
 body[data-profile="hani"] .now time{background:#87456b;color:white}
-</style><body dir="rtl"><header><div><h1>دفتر عملکرد روزانه</h1><span class="profile-name" id="profile-name">دفتر محمود</span></div><div aria-label="انتخاب پروفایل"><button data-profile-choice="mahmoud" class="active" aria-pressed="true">محمود</button> <button data-profile-choice="hani" aria-pressed="false">هانی</button></div></header><main>
+</style><body dir="rtl"><header><div><h1>دفتر عملکرد روزانه <small style="font-size:13px">۱٫۱</small></h1><span class="profile-name" id="profile-name">دفتر محمود</span></div><div aria-label="انتخاب پروفایل"><button data-profile-choice="mahmoud" class="active" aria-pressed="true">محمود</button> <button data-profile-choice="hani" aria-pressed="false">هانی</button></div></header><main>
 <nav class="tabs" role="tablist" aria-label="بخش‌های دفتر">
 <button id="daily-tab" role="tab" aria-selected="true" aria-controls="daily" class="active">ثبت روزانه</button>
 <button id="reports-tab" role="tab" aria-selected="false" aria-controls="reports" tabindex="-1">گزارش‌ها</button>
@@ -66,6 +66,7 @@ body[data-profile="hani"] .now time{background:#87456b;color:white}
 .block .caption{padding-inline:clamp(0px,5cqi,8px);font-size:clamp(8px,18cqi,13px);line-height:1.25}
 .block .caption>span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;white-space:normal;overflow-wrap:anywhere}
 @container (max-width:10px){.block .caption{visibility:hidden}}
+.completion-action{margin-top:12px;width:100%;background:#e4eee6;color:#17553e;border-color:#9ab4a2;font-weight:700}
 </style>
 <section id="daily" role="tabpanel" aria-labelledby="daily-tab">
 <div class="bar tools"><button id="prev">روز قبل</button><input id="date" type="date" aria-label="انتخاب تاریخ"><button id="next">روز بعد</button><button id="today">امروز</button><strong id="date-label"></strong><button id="export" class="grow">پشتیبان‌گیری</button><button id="import">بازیابی</button><input type="file" id="backup" accept=".json,application/json" hidden></div>
@@ -366,11 +367,12 @@ function blockDialog(b, selected){
   if(!options.length){notify('ابتدا از چک‌لیست یک فعالیت اضافه کن.');return;}
   const start=b?.start??clamp(snap(clock().minute),defaultStart,defaultEnd-30);
   show(`<h2>${b?'جزئیات بلوک':'بلوک جدید'}</h2>
+  ${b?`<button class="completion-action" type="submit" value="toggle-completion" formnovalidate>${blockCompleted(day(),b)?'برگرداندن به انجام‌نشده':'انجام شد'}</button>`:''}
   <label>فعالیت<select name="activity">${options.map(a=>`<option value="${a.id}" ${a.id===(selected??b?.activity)?'selected':''}>${safe(a.name)}</option>`).join('')}</select></label>
   <label>شروع<input name="start" dir="ltr" value="${time(start)}" required></label><label>پایان<input name="end" dir="ltr" value="${time(b?.end??start+30)}" required></label>
   <label>ردیف<input name="lane" type="number" min="1" max="${day().lanes+1}" value="${(b?.lane??0)+1}" required></label>
   <label>توضیحات<textarea name="note" maxlength="2000">${safe(b?.note??'')}</textarea></label><p class="empty" role="alert"></p>
-  <div class="tools"><button class="active" value="save">ذخیره</button>${b?`<button value="toggle-completion" formnovalidate>${blockCompleted(day(),b)?'برگرداندن به انجام‌نشده':'انجام شد'}</button>`:''}${b?'<button value="copy">تکثیر</button><button value="delete" formnovalidate>حذف بلوک</button>':''}${cancel}</div>`,(f,action)=>{
+  <div class="tools"><button class="active" value="save">ذخیره</button>${b?'<button value="copy">تکثیر</button><button value="delete" formnovalidate>حذف بلوک</button>':''}${cancel}</div>`,(f,action)=>{
     if(action==='toggle-completion'){
       b.completed=!blockCompleted(day(),b);
       save();
