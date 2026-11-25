@@ -1,4 +1,4 @@
-<!doctype html><html lang="fa"><meta charset="utf-8"><title>دفتر عملکرد روزانه · ۱٫۱</title><meta name="viewport" content="width=device-width, initial-scale=1"><style>
+<!doctype html><html lang="fa"><meta charset="utf-8"><title>برنامه‌ریزی روزانه · ۱٫۳</title><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="manifest" href="./manifest.webmanifest"><link rel="icon" href="./icon-192.png"><meta name="theme-color" content="#f1eee6"><style>
 *{box-sizing:border-box}body{margin:0;background:#f1eee6;color:#16202c;font:16px Tahoma,Arial,sans-serif}header,main{width:calc(100% - 96px);margin:auto}header{height:112px;border-bottom:1px solid #d8d2c4;display:flex;align-items:center;justify-content:space-between}h1{font-size:30px;margin:0;font-weight:500}h2{font-size:18px;margin:0;font-weight:500}h3{font-size:14px;font-weight:400;color:#505b6c;margin:0}button{font:inherit;color:inherit;background:#fffdf9;border:1px solid #d8d2c4;padding:9px 13px;border-radius:2px}.active{background:#f1c331;color:#f1eee6;border-color:#f1c331}.bar{height:83px;display:flex;align-items:center;gap:10px}.bar .grow{margin-inline-start:auto}.grid{display:grid;grid-template-columns:267px minmax(0,1fr);gap:20px}.panel{border:1px solid #d8d2c4;background:#faf8f2}.top{display:flex;justify-content:space-between;align-items:center;padding:16px 17px;border-bottom:1px solid #d8d2c4;height:61px}.check{padding:0 16px}.item{display:flex;align-items:center;gap:11px;height:45px;border-bottom:1px solid #e5dfd3;font-size:14px}.item:last-child{border:none}.swatch{width:4px;height:20px;background:var(--c)}.box{width:17px;height:17px;border:1px solid #9e9789;text-align:center;line-height:15px;color:#216755}.grip{margin-inline-start:auto;color:#f1c331}.timeline{padding:21px 20px}.lane{height:94px;position:relative;border-bottom:1px solid #d8d2c4;background:repeating-linear-gradient(90deg,transparent 0 calc(100% / 12 - 1px),#e6e0d4 calc(100% / 12 - 1px) calc(100% / 12));border-left:1px solid #e6e0d4}.block{position:absolute;top:19px;height:57px;background:var(--c);left:calc(var(--x)*100% / 12);width:calc(var(--w)*100% / 12 - 4px);padding:8px 8px;border-inline:3px solid #ffffff40;color:#fff;white-space:nowrap;overflow:hidden;font-size:13px;line-height:20px;text-align:right}.block small{font-size:11px;color:#16202c}.ticks{display:flex;justify-content:space-between;margin-top:10px;font-size:12px;color:#505b6c}.hint{margin:18px 0 0;color:#f1c331;font-size:13px}.summary{margin-top:23px}.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:#d8d2c4}.metric{background:#faf8f2;padding:15px 17px}.metric strong{display:block;font-size:22px;font-weight:500;margin-top:8px}
 
 [hidden]{display:none!important}
@@ -53,7 +53,7 @@ body[data-profile="hani"] .profile-name,body[data-profile="hani"] .hint{color:#7
 .now time{position:absolute;bottom:100%;left:50%;transform:translateX(-50%);white-space:nowrap;background:#f1c331;color:#16202c;border-radius:5px;padding:4px 6px;font-size:11px}
 body[data-profile="hani"] .now{background:#87456b}
 body[data-profile="hani"] .now time{background:#87456b;color:white}
-</style><body dir="rtl"><header><div><h1>دفتر عملکرد روزانه <small style="font-size:13px">۱٫۱</small></h1><span class="profile-name" id="profile-name">دفتر محمود</span></div><div aria-label="انتخاب پروفایل"><button data-profile-choice="mahmoud" class="active" aria-pressed="true">محمود</button> <button data-profile-choice="hani" aria-pressed="false">هانی</button></div></header><main>
+</style><body dir="rtl"><header><div><h1>برنامه‌ریزی روزانه <small style="font-size:13px">۱٫۳</small></h1><span class="profile-name" id="profile-name">دفتر محمود</span></div><div aria-label="انتخاب پروفایل"><button data-profile-choice="mahmoud" class="active" aria-pressed="true">محمود</button> <button data-profile-choice="hani" aria-pressed="false">هانی</button></div></header><main>
 <nav class="tabs" role="tablist" aria-label="بخش‌های دفتر">
 <button id="daily-tab" role="tab" aria-selected="true" aria-controls="daily" class="active">ثبت روزانه</button>
 <button id="reports-tab" role="tab" aria-selected="false" aria-controls="reports" tabindex="-1">گزارش‌ها</button>
@@ -67,11 +67,13 @@ body[data-profile="hani"] .now time{background:#87456b;color:white}
 .block .caption>span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;white-space:normal;overflow-wrap:anywhere}
 @container (max-width:10px){.block .caption{visibility:hidden}}
 .completion-action{margin-top:12px;width:100%;background:#e4eee6;color:#17553e;border-color:#9ab4a2;font-weight:700}
+.clock-grid .lane.drag-target{background-color:#f1c33130}.clock-grid .block.dragging{z-index:3;cursor:grabbing}
+.sort-grip{cursor:grab}.item.sort-before{box-shadow:inset 0 2px #946500}.item.sort-after{box-shadow:inset 0 -2px #946500}
 </style>
 <section id="daily" role="tabpanel" aria-labelledby="daily-tab">
 <div class="bar tools"><button id="prev">روز قبل</button><input id="date" type="date" aria-label="انتخاب تاریخ"><button id="next">روز بعد</button><button id="today">امروز</button><strong id="date-label"></strong><button id="export" class="grow">پشتیبان‌گیری</button><button id="import">بازیابی</button><input type="file" id="backup" accept=".json,application/json" hidden></div>
 <div class="grid"><aside class="panel"><div class="top"><h2>چک‌لیست</h2><button id="add">＋ فعالیت</button></div><div class="check" id="activities"></div></aside>
-<section class="panel"><div class="top"><h2>تایم‌لاین</h2><div class="tools"><button id="add-block">＋ بلوک</button><button id="add-lane">＋ ردیف</button></div></div>
+<section class="panel"><div class="top"><h2>تایم‌لاین</h2><div class="tools"><button id="add-block">＋ بلوک</button><button id="add-lane">＋ ردیف</button><button id="remove-lane">− ردیف</button></div></div>
 <div class="timeline-scroll"><div dir="ltr"><div class="clock-grid" id="grid"><div id="lanes"></div><div class="now" hidden><time></time></div></div><div class="ticks" id="ticks"></div></div></div>
 <p class="hint" style="padding:0 16px 16px">فعالیت را از ⠿ بکش یا «＋ بلوک» را بزن. برای دیدن جزئیات روی بلوک کلیک کن.</p>
 </section></div></section>
@@ -170,7 +172,8 @@ function activityCompletion(record, id){
   return done===blocks.length?'all':done?'some':'none';
 }
 function renderActivities(){
-  $('activities').innerHTML=activities().map(a=>`<div class="item">
+  $('activities').innerHTML=activities().map(a=>`<div class="item" data-activity-row="${a.id}">
+    <button class="sort-grip" data-sort="${a.id}" draggable="true" aria-label="جابه‌جایی ${safe(a.name)} در چک‌لیست" title="برای مرتب‌کردن چک‌لیست بکش">↕</button>
     <input type="checkbox" data-check="${a.id}" aria-label="تکمیل ${safe(a.name)}" ${activityCompletion(day(),a.id)==='all'?'checked':''}>
     <i class="swatch" style="--c:${a.color}"></i><span class="label">${safe(a.name)}</span>
     <button data-edit="${a.id}" aria-label="ویرایش ${safe(a.name)}">ویرایش</button>
@@ -195,13 +198,66 @@ $('activities').onclick=e=>{
   if(e.target.dataset.drag) blockDialog(null,e.target.dataset.drag);
 };
 let sourceActivity = null;
+let sortingActivity = null;
+function orderAt(items,position){
+  const before=items[position-1]?.order, after=items[position]?.order;
+  return before===undefined?(after??1)-1:after===undefined?before+1:(before+after)/2;
+}
+function moveActivityInChecklist(source,target,after){
+  if(source===target)return;
+  const list=activities();
+  const activity=list.find(item=>item.id===source);
+  const others=list.filter(item=>item.id!==source);
+  const index=others.findIndex(item=>item.id===target);
+  if(!activity||index<0)return;
+  const {id,...value}=activity;
+  editDay().overrides[id]={...value,order:orderAt(others,index+Number(after))};
+  save();
+  renderActivities();
+}
+function clearSortTarget(){
+  for(const row of $('activities').querySelectorAll('.sort-before,.sort-after')){
+    row.classList.remove('sort-before','sort-after');
+  }
+}
+function checklistDropTarget(event){
+  const row=event.target.closest('[data-activity-row]');
+  if(!sortingActivity||!row||row.dataset.activityRow===sortingActivity)return null;
+  const rect=row.getBoundingClientRect();
+  return {row,after:event.clientY>rect.top+rect.height/2};
+}
+$('activities').addEventListener('dragover',event=>{
+  clearSortTarget();
+  const target=checklistDropTarget(event);
+  if(!target)return;
+  event.preventDefault();
+  event.dataTransfer.dropEffect='move';
+  target.row.classList.add(target.after?'sort-after':'sort-before');
+});
+$('activities').addEventListener('drop',event=>{
+  const target=checklistDropTarget(event);
+  if(!target)return;
+  event.preventDefault();
+  const source=sortingActivity;
+  sortingActivity=null;
+  moveActivityInChecklist(source,target.row.dataset.activityRow,target.after);
+});
+$('activities').addEventListener('dragleave',event=>{
+  if(!$('activities').contains(event.relatedTarget))clearSortTarget();
+});
 $('activities').addEventListener('dragstart',e=>{
+  if(e.target.dataset.sort){
+    sortingActivity=e.target.dataset.sort;
+    e.dataTransfer.setData('text/plain',sortingActivity);
+    e.dataTransfer.effectAllowed='move';
+    return;
+  }
   if(!e.target.dataset.drag)return;
   sourceActivity=e.target.dataset.drag;
   e.dataTransfer.setData('text/plain',sourceActivity);
   e.dataTransfer.effectAllowed='copy';
 });
-$('activities').addEventListener('dragend',()=>{sourceActivity=null;document.querySelectorAll('.drop').forEach(n=>n.classList.remove('drop'));});
+$('activities').addEventListener('dragend',()=>{sourceActivity=null;sortingActivity=null;clearSortTarget();document.querySelectorAll('.drop').forEach(n=>n.classList.remove('drop'));});
 function show(content, submit){
   const dialog=$('dialog');
   dialog.innerHTML=`<form>${content}</form>`;
@@ -224,8 +280,7 @@ function activityDialog(a){
     const id=a?.id??uid(), scope=form.get('scope'), days=form.getAll('days').map(Number);
     const position=Number(form.get('position'))-1;
     const others=list.filter(x=>x.id!==id);
-    const before=others[position-1]?.order, after=others[position]?.order;
-    const order=before===undefined?(after??1)-1:after===undefined?before+1:(before+after)/2;
+    const order=orderAt(others,position);
     const value=action==='delete'?null:{name:form.get('name').trim(),category:form.get('category').trim(),color:form.get('color'),days,order};
     if(value && (!value.name || (scope==='future'&&!days.length))){
       $('dialog').querySelector('[role=alert]').textContent='نام فعالیت و برای تکرار دست‌کم یک روز را وارد کن.';return false;
@@ -242,7 +297,9 @@ function activityDialog(a){
 }
 function axis(){
   const blocks=day().blocks;
-  const earliest=blocks.reduce((min,b)=>Math.min(min,b.start),defaultStart);
+  const live=clock();
+  const opening=live.date===date?Math.min(defaultStart,live.minute):defaultStart;
+  const earliest=blocks.reduce((min,b)=>Math.min(min,b.start),opening);
   const latest=blocks.reduce((max,b)=>Math.max(max,b.end),defaultEnd);
   displayStart=Math.floor(earliest/60)*60;
   displayEnd=Math.ceil(latest/60)*60;
@@ -295,7 +352,12 @@ function liveLine(){
   line.style.left=percent(live.minute)+'%';
   line.firstElementChild.textContent=faTime(live.minute)+' تهران';
 }
-setInterval(liveLine,15000);
+let draggingBlock=false;
+setInterval(()=>{
+  const live=clock();
+  if(!draggingBlock&&live.date===date&&live.minute<displayStart&&live.minute<defaultStart)renderTimeline();
+  else liveLine();
+},15000);
 function paint(node,b){
   node.style.setProperty('--left',percent(b.start)+'%');
   node.style.setProperty('--width',Math.max(0,percent(b.end)-percent(b.start))+'%');
@@ -330,7 +392,10 @@ function moveBlock(e,node,original){
   const x=e.clientX,y=e.clientY;
   const scale=(displayEnd-displayStart)/row.getBoundingClientRect().width;
   const draft={...original};
+  const rows=[...$('lanes').children];
+  let targetRow=row;
   let changed=false;
+  draggingBlock=true;
   node.setPointerCapture(e.pointerId);
   const update=ev=>{
     if(!changed&&Math.hypot(ev.clientX-x,ev.clientY-y)<4)return;
@@ -341,18 +406,34 @@ function moveBlock(e,node,original){
     else {
       const length=original.end-original.start;
       draft.start=clamp(original.start+delta,0,1440-length);draft.end=draft.start+length;
-      const target=document.elementFromPoint(ev.clientX,ev.clientY)?.closest('.lane');
-      if(target) draft.lane=Number(target.dataset.lane);
+      targetRow.classList.remove('drag-target');
+      const target=rows.find(candidate=>{
+        const rect=candidate.getBoundingClientRect();
+        return ev.clientY>=rect.top&&ev.clientY<rect.bottom;
+      });
+      if(target)targetRow=target;
+      draft.lane=Number(targetRow.dataset.lane);
+      targetRow.classList.add('drag-target');
+      node.classList.add('dragging');
+      node.style.transform='translateY('+(ev.clientY-y)+'px)';
     }
     paint(node,draft);notify(faTime(draft.start)+' تا '+faTime(draft.end)+' · '+duration(draft.end-draft.start));
   };
   const finish=ev=>{
+    draggingBlock=false;
+    targetRow.classList.remove('drag-target');
     node.removeEventListener('pointermove',update);
     node.removeEventListener('pointerup',finish);
     node.removeEventListener('pointercancel',finish);
     if(!changed)return;
     node.onclick=event=>event.preventDefault();
-    if(ev.type==='pointerup'){putBlock(draft);save();}
+    if(ev.type==='pointerup'){
+      const occupied=!edge&&draft.lane!==original.lane&&day().blocks.some(
+        b=>b.id!==original.id&&b.lane===draft.lane&&overlaps(b,draft)
+      );
+      if(occupied)notify('ردیف مقصد در این ساعت پر است.');
+      else{putBlock(draft);save();}
+    }
     render();
   };
   node.addEventListener('pointermove',update);
@@ -360,6 +441,24 @@ function moveBlock(e,node,original){
   node.addEventListener('pointercancel',finish);
 }
 $('add-lane').onclick=()=>{editDay().lanes++;save();render();};
+$('remove-lane').onclick=()=>{
+  const record=day();
+  if(record.lanes<=1){notify('تایم‌لاین باید حداقل یک ردیف داشته باشد.');return;}
+  const empty=Array.from({length:record.lanes},(_,i)=>i).filter(
+    lane=>!record.blocks.some(block=>block.lane===lane)
+  );
+  if(!empty.length){notify('برای حذف ردیف، ابتدا بلوک‌های آن را به ردیف دیگری منتقل کن.');return;}
+  show(`<h2>حذف ردیف خالی</h2><label>ردیف<select name="lane">${empty.map(lane=>`<option value="${lane}">ردیف ${number(lane+1)}</option>`).join('')}</select></label>
+  <div class="tools"><button class="active">حذف ردیف</button>${cancel}</div>`,form=>{
+    const lane=Number(form.get('lane'));
+    const record=editDay();
+    record.lanes--;
+    for(const block of record.blocks){
+      if(block.lane>lane)block.lane--;
+    }
+    save();
+  });
+};
 $('add-block').onclick=()=>blockDialog();
 function blockDialog(b, selected){
   const options=activities();
@@ -491,7 +590,7 @@ function validate(data){
       check(Object.entries(record.overrides).every(([id,value])=>validId(id)&&activity(value)));
       check(new Set(record.blocks.map(b=>b?.id)).size===record.blocks.length);
       check(record.blocks.every(b=>object(b)&&validId(b.id)&&validId(b.activity)&&validColor(b.color)&&typeof b.name==='string'&&typeof b.category==='string'&&typeof b.note==='string'&&numberBetween(b.start,0,1439)&&numberBetween(b.end,b.start+1,1440)&&numberBetween(b.lane,0,record.lanes-1)&&(b.completed===undefined||typeof b.completed==='boolean')));
-      record.lanes=Math.max(defaultLanes,record.lanes);
+
     }
   }
   return data;
