@@ -59,9 +59,13 @@ body[data-profile="hani"] .now time{background:#87456b;color:white}
 <button id="reports-tab" role="tab" aria-selected="false" aria-controls="reports" tabindex="-1">گزارش‌ها</button>
 </nav>
 <style>
-.tools{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.bar{height:auto;margin:16px 0}.bar input,dialog input,dialog select,dialog textarea{font:inherit;padding:7px;border:1px solid #d8d2c4;border-radius:5px;background:#fffdf9;color:#16202c}.item{gap:6px;height:auto;min-height:43px}.item button{padding:4px 6px}.item .label{flex:1;min-width:0;overflow-wrap:anywhere}.grip{cursor:grab}.timeline-scroll{overflow:auto;padding:0 14px 12px}.timeline-scroll>div{min-width:1100px;padding-inline:16px}.clock-grid .lane{height:78px}.clock-grid .block{left:var(--left);width:var(--width);top:12px;height:54px;display:flex;align-items:center;justify-content:center;padding:0;border:0;cursor:grab;container-type:inline-size;touch-action:none}.block .caption{display:block;min-width:0;max-width:100%;padding-inline:8px;line-height:1.45;font-size:13px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.block .caption small{display:block;font-size:11px;overflow:hidden;text-overflow:ellipsis}.block .edge{position:absolute;top:0;bottom:0;width:6px;cursor:ew-resize;background:#16202c22;z-index:1}.edge.start{left:0}.edge.end{right:0}@container (max-width:105px){.block .caption small{display:none}}@container (max-width:38px){.block .caption{display:none}}.clock-grid .lane{border-left:0}.clock-grid .lane.drop{background-color:#f1c33125}.ticks{position:relative;height:18px}.ticks span{position:absolute;transform:translateX(-50%)}dialog{max-width:calc(100vw - 30px);width:440px;border:1px solid #d8d2c4;border-radius:12px;color:inherit;background:#faf8f2;padding:20px}body[data-profile="hani"] dialog{background:#fff8fa}dialog::backdrop{background:#16202c66}dialog label{display:block;margin:12px 0}dialog input:not([type=checkbox]),dialog select,dialog textarea{max-width:100%;width:100%;margin-top:4px}fieldset{border:1px solid #d8d2c4;margin:10px 0}fieldset label{display:inline-block;margin:5px}#status{min-height:1.4em;font-size:13px;color:#505b6c;margin-block:12px}.empty{color:#505b6c;font-size:14px}.chart-row{grid-template-columns:minmax(105px,160px) minmax(45px,1fr) minmax(88px,155px)}
+.tools{display:flex;gap:7px;flex-wrap:wrap;align-items:center}.bar{height:auto;margin:16px 0}.bar input,dialog input,dialog select,dialog textarea{font:inherit;padding:7px;border:1px solid #d8d2c4;border-radius:5px;background:#fffdf9;color:#16202c}.item{gap:6px;height:auto;min-height:43px}.item button{padding:4px 6px}.item .label{flex:1;min-width:0;overflow-wrap:anywhere}.grip{cursor:grab}.timeline-scroll{overflow:auto;padding:0 14px 12px}.timeline-scroll>div{min-width:1100px;padding-inline:16px}.clock-grid .lane{height:78px}.clock-grid .block{left:var(--left);width:var(--width);top:12px;height:54px;display:flex;align-items:center;justify-content:center;padding:0;border:0;cursor:grab;container-type:inline-size;touch-action:none}.block .caption{display:block;min-width:0;max-width:100%;padding-inline:8px;line-height:1.45;font-size:13px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.block .caption small{display:block;font-size:11px;overflow:hidden;text-overflow:ellipsis}.block .edge{position:absolute;top:0;bottom:0;width:6px;cursor:ew-resize;background:#16202c22;z-index:1}.edge.start{left:0}.edge.end{right:0}@container (max-width:105px){.block .caption small{display:none}}.clock-grid .lane{border-left:0}.clock-grid .lane.drop{background-color:#f1c33125}.ticks{position:relative;height:18px}.ticks span{position:absolute;transform:translateX(-50%)}dialog{max-width:calc(100vw - 30px);width:440px;border:1px solid #d8d2c4;border-radius:12px;color:inherit;background:#faf8f2;padding:20px}body[data-profile="hani"] dialog{background:#fff8fa}dialog::backdrop{background:#16202c66}dialog label{display:block;margin:12px 0}dialog input:not([type=checkbox]),dialog select,dialog textarea{max-width:100%;width:100%;margin-top:4px}fieldset{border:1px solid #d8d2c4;margin:10px 0}fieldset label{display:inline-block;margin:5px}#status{min-height:1.4em;font-size:13px;color:#505b6c;margin-block:12px}.empty{color:#505b6c;font-size:14px}.chart-row{grid-template-columns:minmax(105px,160px) minmax(45px,1fr) minmax(88px,155px)}
 
 .clock-grid .block.is-complete,body[data-profile="hani"] .clock-grid .block.is-complete{background:#e4e4e4;color:#47505b;box-shadow:inset 0 0 0 1px #cdced1}
+
+.block .caption{padding-inline:clamp(0px,5cqi,8px);font-size:clamp(8px,18cqi,13px);line-height:1.25}
+.block .caption>span{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;white-space:normal;overflow-wrap:anywhere}
+@container (max-width:10px){.block .caption{visibility:hidden}}
 </style>
 <section id="daily" role="tabpanel" aria-labelledby="daily-tab">
 <div class="bar tools"><button id="prev">روز قبل</button><input id="date" type="date" aria-label="انتخاب تاریخ"><button id="next">روز بعد</button><button id="today">امروز</button><strong id="date-label"></strong><button id="export" class="grow">پشتیبان‌گیری</button><button id="import">بازیابی</button><input type="file" id="backup" accept=".json,application/json" hidden></div>
@@ -155,17 +159,33 @@ function render(){
   renderTimeline();
   if(tab==='reports') report();
 }
+function blockCompleted(record, block){
+  return block.completed ?? (record.checks[block.activity] === true);
+}
+function activityCompletion(record, id){
+  const blocks=record.blocks.filter(block=>block.activity===id);
+  if(!blocks.length)return record.checks[id]===true?'all':'none';
+  const done=blocks.filter(block=>blockCompleted(record,block)).length;
+  return done===blocks.length?'all':done?'some':'none';
+}
 function renderActivities(){
   $('activities').innerHTML=activities().map(a=>`<div class="item">
-    <input type="checkbox" data-check="${a.id}" aria-label="تکمیل ${safe(a.name)}" ${day().checks[a.id]?'checked':''}>
+    <input type="checkbox" data-check="${a.id}" aria-label="تکمیل ${safe(a.name)}" ${activityCompletion(day(),a.id)==='all'?'checked':''}>
     <i class="swatch" style="--c:${a.color}"></i><span class="label">${safe(a.name)}</span>
     <button data-edit="${a.id}" aria-label="ویرایش ${safe(a.name)}">ویرایش</button>
     <button class="grip" data-drag="${a.id}" draggable="true" aria-label="ثبت زمان ${safe(a.name)}" title="بکش یا کلیک کن">⠿</button></div>`).join('') || '<p class="empty">برای این روز فعالیتی تعریف نشده است.</p>';
+  for(const input of $('activities').querySelectorAll('[data-check]')){
+    input.indeterminate=activityCompletion(day(),input.dataset.check)==='some';
+  }
 }
 $('activities').onchange=e=>{
   const id=e.target.dataset.check;
   if(!id)return;
-  editDay().checks[id]=e.target.checked;
+  const record=editDay();
+  record.checks[id]=e.target.checked;
+  for(const block of record.blocks){
+    if(block.activity===id)delete block.completed;
+  }
   save();
   renderTimeline();
 };
@@ -279,7 +299,7 @@ function paint(node,b){
   node.style.setProperty('--left',percent(b.start)+'%');
   node.style.setProperty('--width',Math.max(0,percent(b.end)-percent(b.start))+'%');
   node.style.setProperty('--c',b.color);
-  const completed=day().checks[b.activity]===true;
+  const completed=blockCompleted(day(),b);
   node.classList.toggle('is-complete',completed);
   const label=b.name+' · '+faTime(b.start)+' تا '+faTime(b.end)+' · '+duration(b.end-b.start)+(completed?' · انجام شده':'');
   node.title=label;node.setAttribute('aria-label',label);
@@ -350,14 +370,20 @@ function blockDialog(b, selected){
   <label>شروع<input name="start" dir="ltr" value="${time(start)}" required></label><label>پایان<input name="end" dir="ltr" value="${time(b?.end??start+30)}" required></label>
   <label>ردیف<input name="lane" type="number" min="1" max="${day().lanes+1}" value="${(b?.lane??0)+1}" required></label>
   <label>توضیحات<textarea name="note" maxlength="2000">${safe(b?.note??'')}</textarea></label><p class="empty" role="alert"></p>
-  <div class="tools"><button class="active" value="save">ذخیره</button>${b?'<button value="copy">تکثیر</button><button value="delete" formnovalidate>حذف بلوک</button>':''}${cancel}</div>`,(f,action)=>{
+  <div class="tools"><button class="active" value="save">ذخیره</button>${b?`<button value="toggle-completion" formnovalidate>${blockCompleted(day(),b)?'برگرداندن به انجام‌نشده':'انجام شد'}</button>`:''}${b?'<button value="copy">تکثیر</button><button value="delete" formnovalidate>حذف بلوک</button>':''}${cancel}</div>`,(f,action)=>{
+    if(action==='toggle-completion'){
+      b.completed=!blockCompleted(day(),b);
+      save();
+      return;
+    }
     if(action==='delete'){editDay().blocks=day().blocks.filter(x=>x.id!==b.id);save();return;}
     const a=options.find(x=>x.id===f.get('activity'));
     const start=parseTime(f.get('start')),end=parseTime(f.get('end'));
     if(!Number.isFinite(start)||!Number.isFinite(end)||start>=end){
       $('dialog').querySelector('[role=alert]').textContent='زمان را مثل ۰۹:۳۰ وارد کن. پایان باید بعد از شروع باشد.';return false;
     }
-    putBlock({id:action==='copy'||!b?uid():b.id,activity:a.id,name:a.name,color:a.color,category:a.category,start,end,lane:Number(f.get('lane'))-1,note:f.get('note')});
+    const completion=action==='copy'?{completed:false}:b?.activity===a.id&&b.completed!==undefined?{completed:b.completed}:{};
+    putBlock({...completion,id:action==='copy'||!b?uid():b.id,activity:a.id,name:a.name,color:a.color,category:a.category,start,end,lane:Number(f.get('lane'))-1,note:f.get('note')});
     save();
   });
 }
@@ -424,7 +450,7 @@ function report(){
   const until=period?Math.min(Date.parse(last),Math.max(Date.parse(clock().date),Date.parse(date))):Date.parse(last);
   for(let d=first;d<=last;d=shift(d,1)){
     const record=day(d), list=activities(d);
-    if(Date.parse(d)<=until||profile().days[d]){planned+=list.length;done+=list.filter(a=>record.checks[a.id]).length;}
+    if(Date.parse(d)<=until||profile().days[d]){planned+=list.length;done+=list.filter(a=>activityCompletion(record,a.id)==='all').length;}
     const blocks=$('parallel').checked?marketBlocks(record.blocks):record.blocks;
     const totals=coverage(blocks);
     for(const k of Object.keys(sums))sums[k]+=totals[k];
@@ -462,7 +488,7 @@ function validate(data){
       check(Object.entries(record.checks).every(([id,value])=>validId(id)&&typeof value==='boolean'));
       check(Object.entries(record.overrides).every(([id,value])=>validId(id)&&activity(value)));
       check(new Set(record.blocks.map(b=>b?.id)).size===record.blocks.length);
-      check(record.blocks.every(b=>object(b)&&validId(b.id)&&validId(b.activity)&&validColor(b.color)&&typeof b.name==='string'&&typeof b.category==='string'&&typeof b.note==='string'&&numberBetween(b.start,0,1439)&&numberBetween(b.end,b.start+1,1440)&&numberBetween(b.lane,0,record.lanes-1)));
+      check(record.blocks.every(b=>object(b)&&validId(b.id)&&validId(b.activity)&&validColor(b.color)&&typeof b.name==='string'&&typeof b.category==='string'&&typeof b.note==='string'&&numberBetween(b.start,0,1439)&&numberBetween(b.end,b.start+1,1440)&&numberBetween(b.lane,0,record.lanes-1)&&(b.completed===undefined||typeof b.completed==='boolean')));
       record.lanes=Math.max(defaultLanes,record.lanes);
     }
   }
