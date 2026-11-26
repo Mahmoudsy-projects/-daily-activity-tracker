@@ -46,7 +46,137 @@ button:focus-visible{outline:2px solid #416b9c;outline-offset:2px}
 body[data-profile="hani"] [data-profile-choice="hani"][aria-pressed="true"],
 body[data-profile="hani"] .tabs [aria-selected="true"]{background:#87456b;color:#fff;border-color:#87456b}
 body[data-profile="hani"] .tabs [aria-selected="false"]{background:#fff3f8;color:#63344f;border-color:#e4cbd8}
-</style><body dir="rtl"><header><div><h1>برنامه‌ریزی روزانه <small style="font-size:13px">۱٫۳</small></h1><span class="profile-name" id="profile-name">دفتر محمود</span></div><div aria-label="انتخاب پروفایل"><button data-profile-choice="mahmoud" class="active" aria-pressed="true">محمود</button> <button data-profile-choice="hani" aria-pressed="false">هانی</button></div></header><main>
+</style></head><body dir="rtl"><style>
+@media (max-width: 760px) {
+  .timeline{overflow:visible}
+  .timeline>.timeline-scroll{min-width:0;overflow-x:auto;overflow-y:hidden}
+  .compact-table{max-width:100%;overflow-x:auto}
+}
+@media (pointer:coarse) {
+  .clock-grid .block{touch-action:auto}
+}
+</style><script>
+window.syncNotebook = function ({path, key, validate, read, apply, hasLocalData = () => true}) {
+  // Enable server storage when this copy is installed at its notebook route over HTTPS.
+  if (location.protocol !== 'https:' || !location.pathname.startsWith('/day-planner/')) return () => {};
+  const stateKey = key + ':sync';
+  const status = document.createElement('p');
+  status.setAttribute('role', 'status');
+  status.style.cssText = 'margin:8px 14px;font:13px Tahoma,Arial,sans-serif;text-align:right';
+  const message = document.createElement('span');
+  const retry = document.createElement('button');
+  retry.textContent = 'تلاش دوباره';
+  retry.hidden = true;
+  status.append(message, ' ', retry);
+  document.body.insertBefore(status, document.getElementById('nb-nav')?.nextSibling ?? document.body.firstChild);
+
+  let revision = null;
+  let pending = null;
+  let running = false;
+  let conflict = false;
+  let cacheFailed = false;
+  function localSet(name, value) {
+    try { localStorage.setItem(name, value); }
+    catch { cacheFailed = true; }
+  }
+  try {
+    const state = JSON.parse(localStorage.getItem(stateKey));
+    const local = localStorage.getItem(key);
+    if (state) {
+      revision = state.revision;
+      pending = state.pending ? validate(state.pending) : null;
+      if (pending) apply(pending);
+      else if (local === null) revision = null;
+    } else if (local !== null) {
+      const value = validate(JSON.parse(local));
+      if (hasLocalData(value)) pending = value;
+    }
+  } catch {
+    conflict = true;
+    message.textContent = 'خواندن نسخهٔ محلی ممکن نشد. ابتدا از اطلاعاتت پشتیبان بگیر.';
+  }
+
+  function persist() {
+    localSet(stateKey, JSON.stringify({revision, pending}));
+  }
+  async function api(op, query = '', data) {
+    const response = await fetch('../api.php?op=' + op + query, {
+      credentials:'same-origin', cache:'no-store', signal:AbortSignal.timeout(12000),
+      ...(data === undefined ? {} : {
+        method:'POST', headers:{'X-NB':'1','Content-Type':'application/json'},
+        body:JSON.stringify({path,data})
+      })
+    });
+    const result = await response.json();
+    if (!response.ok || !result.ok) throw Error('Sync request failed');
+    return result;
+  }
+
+  async function sync() {
+    if (running || conflict) return;
+    running = true;
+    retry.hidden = true;
+    message.textContent = pending ? 'در حال ذخیره روی سایت…' : 'در حال دریافت اطلاعات از سایت…';
+    try {
+      const result = await api('get', '&path=' + encodeURIComponent(path));
+      const remote = result.exists ? result.data : null;
+      if (remote && (typeof remote.revision !== 'string' || !Object.hasOwn(remote,'value'))) {
+        throw Error('Invalid server record');
+      }
+      const serverRevision = remote?.revision ?? null;
+      if (pending && serverRevision !== revision) {
+        if (remote && remote.previous === revision &&
+            JSON.stringify(remote.value) === JSON.stringify(pending)) {
+          pending = null;
+          revision = serverRevision;
+          persist();
+        } else {
+          conflict = true;
+          message.textContent = 'نسخهٔ گوشی یا کامپیوتر با سایت فرق دارد. تغییر محلی حفظ شده؛ قبل از ادامه پشتیبان بگیر.';
+          return;
+        }
+      }
+      if (pending) {
+        const value = pending;
+        const nextRevision = crypto.randomUUID();
+        await api('set', '', {revision:nextRevision,previous:revision,value});
+        revision = nextRevision;
+        if (pending === value) pending = null;
+        persist();
+      } else if (remote && serverRevision !== revision) {
+        const value = validate(remote.value);
+        apply(value);
+        localSet(key, JSON.stringify(value));
+        revision = serverRevision;
+        persist();
+      }
+      message.textContent = remote || revision ? 'ذخیره روی سایت تأیید شد.' : 'اتصال به سایت برقرار است.';
+    } catch {
+      retry.hidden = false;
+      message.textContent = pending
+        ? (cacheFailed ? 'ذخیره روی سایت انجام نشد. صفحه را باز نگه دار و پشتیبان بگیر.' : 'تغییر محلی محفوظ است. ارسال به سایت دوباره امتحان می‌شود.')
+        : 'دریافت از سایت ممکن نشد. نسخهٔ محلی نمایش داده می‌شود.';
+    } finally {
+      running = false;
+    }
+    if (pending && retry.hidden && !conflict) void sync();
+  }
+
+  retry.onclick = sync;
+  window.addEventListener('online', sync);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') void sync();
+  });
+  setInterval(() => { if (pending && !document.hidden) void sync(); }, 8000);
+  void sync();
+
+  return function saveToSite() {
+    pending = JSON.parse(JSON.stringify(read()));
+    persist();
+    void sync();
+  };
+};
+</script><header><div><h1>برنامه‌ریزی روزانه <small style="font-size:13px">۱٫۳</small></h1><span class="profile-name" id="profile-name">دفتر محمود</span></div><div aria-label="انتخاب پروفایل"><button data-profile-choice="mahmoud" class="active" aria-pressed="true">محمود</button> <button data-profile-choice="hani" aria-pressed="false">هانی</button></div></header><main>
 <nav class="tabs" role="tablist" aria-label="بخش‌های دفتر">
 <button id="daily-tab" role="tab" aria-selected="true" aria-controls="daily" class="active">ثبت روزانه</button>
 <button id="reports-tab" role="tab" aria-selected="false" aria-controls="reports" tabindex="-1">گزارش‌ها</button>
@@ -118,8 +248,10 @@ function activities(d=date) {
 }
 function notify(message){ $('status').textContent=message; }
 function save() {
-  try { localStorage.setItem(key,JSON.stringify(db)); notify('ذخیره شد.'); return true; }
-  catch { notify('مرورگر ذخیرهٔ محلی را انجام نداد. از دکمهٔ پشتیبان‌گیری استفاده کن.'); return false; }
+  try { localStorage.setItem(key,JSON.stringify(db)); }
+  catch { notify('ذخیرهٔ محلی ممکن نشد. وضعیت ذخیره روی سایت را بررسی کن.'); }
+  saveToSite();
+  return true;
 }
 try { const saved=localStorage.getItem(key); if(saved) db=validate(JSON.parse(saved)); }
 catch { notify('خواندن دادهٔ محلی ممکن نبود. اگر نسخهٔ پشتیبان داری، آن را بازیابی کن.'); }
@@ -390,7 +522,7 @@ function putBlock(b){
   d.blocks=d.blocks.filter(x=>x.id!==b.id).concat(b);
 }
 function moveBlock(e,node,original){
-  if(e.button!==0)return;
+  if(e.button!==0 || e.pointerType==='touch')return;
   const row=node.parentElement, edge=e.target.dataset.edge;
   const x=e.clientX,y=e.clientY;
   const scale=(displayEnd-displayStart)/row.getBoundingClientRect().width;
@@ -603,12 +735,64 @@ $('export').onclick=()=>{
   const link=document.createElement('a');link.href=url;link.download='Daily_Activity_Backup_'+clock().date+'.json';link.click();
   setTimeout(()=>URL.revokeObjectURL(url),10000);
 };
+function convertLegacyBackup(legacy) {
+  const converted = {version:1, profiles:{}};
+  if (legacy.format !== 'dayPlannerBackup:1') throw Error('Invalid backup');
+  for (const name of ['mahmoud','hani']) {
+    const source = legacy.persons?.[name];
+    if (!source || !source.days || typeof source.days !== 'object') throw Error('Invalid profile');
+    const result = {rules:{}, days:{}};
+    converted.profiles[name] = result;
+    const activityId = id => 'old-' + Array.from(String(id), c => c.codePointAt(0).toString(16)).join('-');
+    const activity = (title, days, order) => ({name:String(title || 'فعالیت'), color:colors[order%colors.length], category:'', order, days});
+    for (const [dow, config] of Object.entries(source.plan?.days ?? {})) {
+      for (const [order, b] of (config.blocks ?? []).entries()) {
+        for (const sub of b.sub?.length ? b.sub : [{id:b.id,t:b.title}]) {
+          const id = activityId(sub.id);
+          const existing = result.rules[id]?.[0].value;
+          if (existing) existing.days.push(Number(dow));
+          else result.rules[id] = [{date:'0001-01-01',value:activity(sub.t,[Number(dow)],order)}];
+        }
+      }
+    }
+    for (const [day, data] of Object.entries(source.days)) {
+      const record = blank();
+      result.days[day] = record;
+      const known = new Set();
+      const dow = weekday(day);
+      const original = source.plan?.days?.[dow]?.blocks ?? [];
+      const blocks = new Map([...original, ...(data.bk ?? []), ...(data.x ?? [])].map(b=>[String(b.id),b]));
+      const entries = data.p?.items ?? [...blocks.values()].flatMap(b =>
+        b.sub?.length ? b.sub.map(s=>({id:s.id,n:s.t,b:b.id})) : [{id:b.id,n:b.title,b:b.id}]);
+      for (const [order, item] of entries.entries()) {
+        if (data.s?.[item.b]) continue;
+        const id = activityId(item.id);
+        known.add(id);
+        record.overrides[id] = activity(item.n, [dow], order);
+        if (typeof data.c?.[item.id] === 'boolean') record.checks[id] = data.c[item.id];
+      }
+      for (const [entry, checked] of Object.entries(data.c ?? {})) {
+        const id = activityId(entry);
+        if (!known.has(id) && typeof checked === 'boolean' && !data.s?.[entry]) {
+          record.overrides[id] = activity(entry, [dow], entries.length);
+          record.checks[id] = checked;
+        }
+      }
+      for (const [id, rule] of Object.entries(result.rules)) {
+        if (!Object.hasOwn(record.overrides,id)) record.overrides[id] = null;
+      }
+    }
+  }
+  return validate(converted);
+}
+
 $('import').onclick=()=>$('backup').click();
 $('backup').onchange=async e=>{
   const file=e.target.files[0];e.target.value='';
   if(!file)return;
   try{
-    const incoming=validate(JSON.parse(await file.text()));
+    const imported=JSON.parse(await file.text());
+    const incoming=imported.format==='dayPlannerBackup:1' ? convertLegacyBackup(imported) : validate(imported);
     show('<h2>بازیابی نسخهٔ پشتیبان</h2><p>داده‌های فعلی هر دو پروفایل با محتوای این فایل جایگزین می‌شوند.</p><div class="tools"><button class="active">بازیابی</button>'+cancel+'</div>',()=>{
       const previous=db;db=incoming;
       if(!save()){db=previous;$('dialog').querySelector('p').textContent='ذخیرهٔ محلی ممکن نشد. داده‌های فعلی هنوز برقرارند.';return false;}
@@ -616,4 +800,9 @@ $('backup').onchange=async e=>{
   }catch{notify('این فایل، پشتیبان معتبر دفتر فعالیت نیست.');}
 };
 render();
+const saveToSite=window.syncNotebook({
+  path:'day-planner-v13__notebook/state',key,validate,
+  read:()=>db,apply:value=>{db=value;render();}
+});
 </script></body></html>
+
